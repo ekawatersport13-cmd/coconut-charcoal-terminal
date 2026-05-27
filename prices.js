@@ -1,6 +1,6 @@
 var priceDatabase = {
-  "updated": "2026-05-28T00:17:08+08",
-  "source": "模拟数据",
+  "updated": "2026-05-27T17:39:36+08",
+  "source": "SMM导入",
   "history": [
     {
       "date": "2026-03-28",
@@ -723,18 +723,6 @@ var priceDatabase = {
       "note": ""
     },
     {
-      "date": "2026-05-27",
-      "raw": 4550,
-      "bbq": 4250,
-      "shisha": 6900,
-      "ac800": 7600,
-      "ac1000": 9950,
-      "usd_idr": 16500,
-      "usd_cny": 7.25,
-      "freight": 1220,
-      "note": "今日采集"
-    },
-    {
       "date": "2026-05-28",
       "note": "模拟数据",
       "raw": 4545,
@@ -745,6 +733,18 @@ var priceDatabase = {
       "usd_idr": 17798,
       "usd_cny": 6.8,
       "freight": 1235
+    },
+    {
+      "date": "2026-05-27",
+      "note": "SMM导入",
+      "raw": 8000,
+      "bbq": 4218,
+      "shisha": 6922,
+      "ac800": 7571,
+      "ac1000": 9959,
+      "usd_idr": 17798,
+      "usd_cny": 6.8,
+      "freight": 1258
     }
   ]
 };
