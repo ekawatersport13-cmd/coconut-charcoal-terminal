@@ -34,6 +34,11 @@ html, body {
   font-family: var(--font-sans);
   overflow: hidden;
   font-size: 13px;
+  /* 字体渲染优化 - 解决Windows上中文模糊问题 */
+  -webkit-font-smoothing: antialised;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  font-weight: 400;
 }
 
 /* ========== TOP BAR ========== */
