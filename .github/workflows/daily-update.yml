@@ -28,21 +28,17 @@ jobs:
         run: |
           echo "=== Repo root ==="
           ls -la
-          echo "=== coconut_terminal/ ==="
-          ls -la coconut_terminal/
           echo "=== Python version ==="
           python --version
 
       - name: Run price_updater
-        run: |
-          cd coconut_terminal
-          python price_updater.py --force
+        run: python price_updater.py --force
 
       - name: Commit and push changes
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add coconut_terminal/prices.js
+          git add prices.js
           if git diff --quiet && git diff --staged --quiet; then
             echo "No changes to commit"
           else
