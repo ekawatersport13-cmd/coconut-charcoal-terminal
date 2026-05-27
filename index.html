@@ -12,8 +12,8 @@
   --border: #1e2860;
   --border2: #2a3678;
   --text: #c8d6e5;
-  --text2: #6b7db3;
-  --text3: #485580;
+  --text2: #8a9cc8;
+  --text3: #5b6b99;
   --amber: #f5a623;
   --amber2: #f7b955;
   --green: #00e396;
@@ -23,17 +23,17 @@
   --purple: #a855f7;
   --gold: #f59e0b;
   --white: #eef2ff;
-  --font-mono: 'SF Mono', 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
-  --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  --font-mono: 'SF Mono', 'Cascadia Code', 'Fira Code', 'Consolas', 'Microsoft YaHei', monospace;
+  --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', 'Noto Sans SC', sans-serif;
 }
 * { margin:0; padding:0; box-sizing:border-box; }
 html, body {
   height: 100%;
   background: var(--bg);
-  color: #d4dded;
+  color: #e0e8f5;
   font-family: var(--font-sans);
   overflow: hidden;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 500;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -81,7 +81,8 @@ html, body {
 }
 .ticker-item {
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 12px;
+  font-weight: 500;
   display: flex;
   gap: 6px;
   align-items: center;
@@ -118,7 +119,8 @@ html, body {
   padding: 10px 16px;
   color: var(--text2);
   cursor: pointer;
-  font-size: 12px;
+  font-size: 13px;
+  font-weight: 600;
   transition: all 0.15s;
   border-left: 2px solid transparent;
   display: flex;
@@ -154,7 +156,8 @@ html, body {
 }
 .sidebar .section-head {
   padding: 6px 16px;
-  font-size: 10px;
+  font-size: 11px;
+  font-weight: 700;
   color: var(--text3);
   text-transform: uppercase;
   letter-spacing: 1px;
@@ -200,7 +203,8 @@ html, body {
   gap: 10px;
   flex-shrink: 0;
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 12px;
+  font-weight: 500;
 }
 .bottombar .cmd-prompt { color: var(--amber); }
 .bottombar input {
@@ -209,7 +213,8 @@ html, body {
   border: none;
   color: var(--amber);
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 12px;
+  font-weight: 500;
   outline: none;
 }
 .bottombar .status {
@@ -228,10 +233,10 @@ html, body {
 
 /* ========== COMPONENTS ========== */
 .panel-header {
-  font-size: 11px;
+  font-size: 12px;
   color: var(--amber);
   font-family: var(--font-mono);
-  font-weight: 600;
+  font-weight: 700;
   letter-spacing: 0.5px;
   margin-bottom: 8px;
   padding-bottom: 6px;
@@ -263,7 +268,8 @@ html, body {
   padding: 10px 12px;
 }
 .metric-card .metric-label {
-  font-size: 10px;
+  font-size: 11px;
+  font-weight: 600;
   color: var(--text3);
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -276,7 +282,7 @@ html, body {
   font-family: var(--font-mono);
 }
 .metric-card .metric-sub {
-  font-size: 10px;
+  font-size: 11px;
   color: var(--text2);
   margin-top: 2px;
 }
@@ -291,15 +297,16 @@ html, body {
 .data-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 11px;
+  font-size: 12px;
+  font-weight: 500;
   font-family: var(--font-mono);
 }
 .data-table th {
   text-align: left;
   padding: 6px 8px;
   color: var(--text3);
-  font-size: 10px;
-  font-weight: 500;
+  font-size: 11px;
+  font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   border-bottom: 1px solid var(--border);
@@ -318,8 +325,8 @@ html, body {
   display: inline-block;
   padding: 1px 6px;
   border-radius: 2px;
-  font-size: 10px;
-  font-weight: 600;
+  font-size: 11px;
+  font-weight: 700;
 }
 .tag-green { background: rgba(0,227,150,0.15); color: var(--green); }
 .tag-red { background: rgba(255,69,96,0.15); color: var(--red); }
@@ -335,7 +342,8 @@ html, body {
 }
 .form-group { display: flex; flex-direction: column; gap: 3px; }
 .form-group label {
-  font-size: 10px;
+  font-size: 11px;
+  font-weight: 600;
   color: var(--text3);
   font-family: var(--font-mono);
   text-transform: uppercase;
@@ -355,8 +363,8 @@ html, body {
   border-color: var(--amber);
 }
 .form-group .hint {
-  font-size: 9px;
-  color: var(--text3);
+  font-size: 10px;
+  color: var(--text2);
 }
 
 .btn {
@@ -384,9 +392,11 @@ html, body {
   padding: 8px 12px;
   border-left: 3px solid;
   background: var(--panel2);
-  font-size: 11px;
+  font-size: 12px;
+  font-weight: 500;
   margin-bottom: 6px;
   font-family: var(--font-mono);
+  line-height: 1.6;
 }
 .alert.warn { border-color: var(--amber); color: var(--amber2); }
 .alert.info { border-color: var(--blue); color: #5ba0f5; }
@@ -415,7 +425,7 @@ html, body {
   padding: 12px;
 }
 .region-card .r-name {
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 700;
   color: var(--amber);
   font-family: var(--font-mono);
@@ -424,7 +434,8 @@ html, body {
 .region-card .r-stat {
   display: flex;
   justify-content: space-between;
-  font-size: 11px;
+  font-size: 12px;
+  font-weight: 500;
   padding: 3px 0;
   border-bottom: 1px solid rgba(30,40,96,0.3);
 }
@@ -470,7 +481,7 @@ html, body {
   font-family: var(--font-mono);
   color: var(--green);
 }
-.result-banner .label { font-size: 10px; color: var(--text3); margin-bottom: 4px; letter-spacing: 1px; }
+.result-banner .label { font-size: 11px; font-weight: 600; color: var(--text3); margin-bottom: 4px; letter-spacing: 1px; }
 
 /* Toast */
 .toast {
