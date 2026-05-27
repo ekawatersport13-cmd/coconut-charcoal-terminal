@@ -1,0 +1,1624 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>COCONUT SHELL CHARCOAL TERMINAL — 椰壳炭行情终端</title>
+<style>
+:root {
+  --bg: #0a0e27;
+  --panel: #0f1433;
+  --panel2: #151b3d;
+  --border: #1e2860;
+  --border2: #2a3678;
+  --text: #c8d6e5;
+  --text2: #6b7db3;
+  --text3: #485580;
+  --amber: #f5a623;
+  --amber2: #f7b955;
+  --green: #00e396;
+  --red: #ff4560;
+  --blue: #2d7dd2;
+  --cyan: #00c9db;
+  --purple: #a855f7;
+  --gold: #f59e0b;
+  --white: #eef2ff;
+  --font-mono: 'SF Mono', 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+  --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+html, body {
+  height: 100%;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+  overflow: hidden;
+  font-size: 13px;
+}
+
+/* ========== TOP BAR ========== */
+.topbar {
+  height: 28px;
+  background: #000000;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  padding: 0 10px;
+  gap: 0;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.topbar .brand {
+  color: var(--amber);
+  font-weight: 700;
+  font-size: 12px;
+  font-family: var(--font-mono);
+  white-space: nowrap;
+  padding-right: 12px;
+  border-right: 1px solid var(--border);
+  margin-right: 8px;
+  letter-spacing: 0.5px;
+}
+.topbar .brand span { color: var(--text2); }
+.ticker-wrap {
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+}
+.ticker {
+  display: flex;
+  gap: 24px;
+  animation: scroll 120s linear infinite;
+  white-space: nowrap;
+}
+@keyframes scroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+.ticker-item {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+.ticker-item .sym { color: var(--text3); }
+.ticker-item .val { font-weight: 600; color: var(--text); }
+.ticker-item .chg.up { color: var(--green); }
+.ticker-item .chg.down { color: var(--red); }
+.topbar .time {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text3);
+  white-space: nowrap;
+  padding-left: 12px;
+}
+
+/* ========== MAIN LAYOUT ========== */
+.main {
+  display: flex;
+  height: calc(100vh - 28px - 32px);
+  flex: 1;
+}
+.sidebar {
+  width: 160px;
+  min-width: 160px;
+  background: #0c0f1f;
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  padding: 8px 0;
+  overflow-y: auto;
+}
+.sidebar .nav-item {
+  padding: 10px 16px;
+  color: var(--text2);
+  cursor: pointer;
+  font-size: 12px;
+  transition: all 0.15s;
+  border-left: 2px solid transparent;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  user-select: none;
+}
+.sidebar .nav-item:hover {
+  color: var(--text);
+  background: rgba(245,166,35,0.08);
+}
+.sidebar .nav-item.active {
+  color: var(--amber);
+  background: rgba(245,166,35,0.12);
+  border-left-color: var(--amber);
+}
+.sidebar .nav-item .key {
+  font-size: 10px;
+  color: var(--text3);
+  font-family: var(--font-mono);
+  background: var(--panel2);
+  padding: 1px 5px;
+  border-radius: 3px;
+}
+.sidebar .nav-item.active .key {
+  color: var(--amber);
+  background: rgba(245,166,35,0.15);
+}
+.sidebar .divider {
+  height: 1px;
+  background: var(--border);
+  margin: 8px 12px;
+}
+.sidebar .section-head {
+  padding: 6px 16px;
+  font-size: 10px;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.content-area {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+}
+.center-panel {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.center-panel::-webkit-scrollbar { width: 4px; }
+.center-panel::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+.center-panel::-webkit-scrollbar-track { background: transparent; }
+
+.right-panel {
+  width: 260px;
+  min-width: 260px;
+  background: #0c0f1f;
+  border-left: 1px solid var(--border);
+  padding: 12px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* ========== BOTTOM BAR ========== */
+.bottombar {
+  height: 32px;
+  background: #0c0f1f;
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  padding: 0 12px;
+  gap: 10px;
+  flex-shrink: 0;
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+.bottombar .cmd-prompt { color: var(--amber); }
+.bottombar input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: var(--amber);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  outline: none;
+}
+.bottombar .status {
+  color: var(--text3);
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+.bottombar .status .dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--green);
+  box-shadow: 0 0 6px var(--green);
+}
+
+/* ========== COMPONENTS ========== */
+.panel-header {
+  font-size: 11px;
+  color: var(--amber);
+  font-family: var(--font-mono);
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--border);
+  text-transform: uppercase;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.panel-header .badge {
+  font-size: 9px;
+  padding: 2px 6px;
+  border-radius: 2px;
+  background: rgba(0, 227, 150, 0.15);
+  color: var(--green);
+}
+
+.metric-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.metric-row.col3 { grid-template-columns: 1fr 1fr 1fr; }
+.metric-row.col4 { grid-template-columns: 1fr 1fr 1fr 1fr; }
+.metric-card {
+  background: var(--panel2);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 10px 12px;
+}
+.metric-card .metric-label {
+  font-size: 10px;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+  font-family: var(--font-mono);
+}
+.metric-card .metric-value {
+  font-size: 19px;
+  font-weight: 700;
+  font-family: var(--font-mono);
+}
+.metric-card .metric-sub {
+  font-size: 10px;
+  color: var(--text2);
+  margin-top: 2px;
+}
+.metric-card.flash {
+  border-color: var(--amber);
+}
+.metric-card.highlight {
+  background: linear-gradient(135deg, rgba(245,166,35,0.08), var(--panel2));
+  border-color: rgba(245,166,35,0.3);
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 11px;
+  font-family: var(--font-mono);
+}
+.data-table th {
+  text-align: left;
+  padding: 6px 8px;
+  color: var(--text3);
+  font-size: 10px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid var(--border);
+}
+.data-table td {
+  padding: 5px 8px;
+  border-bottom: 1px solid rgba(30,40,96,0.5);
+  color: var(--text);
+}
+.data-table tr:hover td { background: rgba(245,166,35,0.05); }
+.data-table .up { color: var(--green); }
+.data-table .down { color: var(--red); }
+.data-table .neutral { color: var(--amber); }
+
+.tag {
+  display: inline-block;
+  padding: 1px 6px;
+  border-radius: 2px;
+  font-size: 10px;
+  font-weight: 600;
+}
+.tag-green { background: rgba(0,227,150,0.15); color: var(--green); }
+.tag-red { background: rgba(255,69,96,0.15); color: var(--red); }
+.tag-amber { background: rgba(245,166,35,0.15); color: var(--amber); }
+.tag-blue { background: rgba(45,125,210,0.15); color: var(--blue); }
+
+/* Form Elements */
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.form-group { display: flex; flex-direction: column; gap: 3px; }
+.form-group label {
+  font-size: 10px;
+  color: var(--text3);
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+}
+.form-group input, .form-group select {
+  background: #0a0e27;
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 7px 10px;
+  border-radius: 3px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.form-group input:focus, .form-group select:focus {
+  border-color: var(--amber);
+}
+.form-group .hint {
+  font-size: 9px;
+  color: var(--text3);
+}
+
+.btn {
+  padding: 8px 16px;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  background: var(--panel2);
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  cursor: pointer;
+  transition: all 0.15s;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.btn:hover { border-color: var(--amber); color: var(--amber); }
+.btn.amber { background: rgba(245,166,35,0.15); border-color: rgba(245,166,35,0.4); color: var(--amber); }
+.btn.amber:hover { background: rgba(245,166,35,0.25); }
+.btn.green { background: rgba(0,227,150,0.1); border-color: rgba(0,227,150,0.3); color: var(--green); }
+.btn.red { background: rgba(255,69,96,0.1); border-color: rgba(255,69,96,0.3); color: var(--red); }
+.btn.sm { padding: 4px 10px; font-size: 10px; }
+
+/* Alerts */
+.alert {
+  padding: 8px 12px;
+  border-left: 3px solid;
+  background: var(--panel2);
+  font-size: 11px;
+  margin-bottom: 6px;
+  font-family: var(--font-mono);
+}
+.alert.warn { border-color: var(--amber); color: var(--amber2); }
+.alert.info { border-color: var(--blue); color: #5ba0f5; }
+.alert.danger { border-color: var(--red); color: #ff7090; }
+
+/* Chart */
+.chart-box {
+  background: var(--panel2);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 12px;
+  position: relative;
+}
+.chart-box canvas { width: 100%; height: 100%; }
+
+/* Supply region cards */
+.region-cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.region-card {
+  background: var(--panel2);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 12px;
+}
+.region-card .r-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--amber);
+  font-family: var(--font-mono);
+  margin-bottom: 6px;
+}
+.region-card .r-stat {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  padding: 3px 0;
+  border-bottom: 1px solid rgba(30,40,96,0.3);
+}
+.region-card .r-stat:last-child { border-bottom: none; }
+.region-card .r-stat .l { color: var(--text3); }
+.region-card .r-stat .v { font-weight: 600; font-family: var(--font-mono); }
+
+/* ========== VIEW PANELS ========== */
+.view { display: none; }
+.view.active { display: block; }
+
+/* ========== RESPONSIVE ========== */
+@media (max-width: 900px) {
+  .sidebar { display: none; }
+  .right-panel { width: 200px; min-width: 200px; }
+}
+@media (max-width: 600px) {
+  .right-panel { display: none; }
+  .metric-row { grid-template-columns: 1fr 1fr; }
+  .region-cards { grid-template-columns: 1fr; }
+  .form-row { grid-template-columns: 1fr; }
+}
+
+/* ========== ANIMATIONS ========== */
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+.blink { animation: pulse 2s infinite; }
+
+/* Result highlight */
+.result-banner {
+  background: linear-gradient(135deg, rgba(245,166,35,0.1), rgba(0,227,150,0.05));
+  border: 1px solid rgba(245,166,35,0.3);
+  border-radius: 4px;
+  padding: 16px;
+  text-align: center;
+  margin-top: 12px;
+}
+.result-banner .big-num {
+  font-size: 32px;
+  font-weight: 800;
+  font-family: var(--font-mono);
+  color: var(--green);
+}
+.result-banner .label { font-size: 10px; color: var(--text3); margin-bottom: 4px; letter-spacing: 1px; }
+
+/* Toast */
+.toast {
+  position: fixed;
+  top: 36px;
+  right: 16px;
+  background: var(--panel);
+  border: 1px solid var(--amber);
+  color: var(--amber);
+  padding: 8px 16px;
+  border-radius: 3px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  opacity: 0;
+  transform: translateY(-10px);
+  transition: all 0.3s;
+  z-index: 1000;
+  pointer-events: none;
+}
+.toast.show { opacity: 1; transform: translateY(0); }
+</style>
+</head>
+<body>
+
+<!-- ====== TOP BAR ====== -->
+<div class="topbar">
+  <div class="brand">CSC<span>↗CN</span></div>
+  <div class="ticker-wrap">
+    <div class="ticker" id="ticker">
+      <!-- Filled by JS -->
+    </div>
+  </div>
+  <div class="time" id="clock">2026-05-27 22:21:00</div>
+</div>
+
+<!-- ====== MAIN ====== -->
+<div class="main">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="section-head">VIEWS</div>
+    <div class="nav-item active" onclick="switchView('overview')" data-view="overview">
+      <span>📊 行业总览</span><span class="key">F1</span>
+    </div>
+    <div class="nav-item" onclick="switchView('charts')" data-view="charts">
+      <span>📈 价格图表</span><span class="key">F2</span>
+    </div>
+    <div class="nav-item" onclick="switchView('calculator')" data-view="calculator">
+      <span>🧮 利润计算</span><span class="key">F3</span>
+    </div>
+    <div class="divider"></div>
+    <div class="section-head">INTEL</div>
+    <div class="nav-item" onclick="switchView('supply')" data-view="supply">
+      <span>🏭 产地供应链</span><span class="key">F4</span>
+    </div>
+    <div class="nav-item" onclick="switchView('china')" data-view="china">
+      <span>🇨🇳 中国市场</span><span class="key">F5</span>
+    </div>
+    <div class="divider"></div>
+    <div class="section-head">TOOLS</div>
+    <div class="nav-item" onclick="switchView('tracker')" data-view="tracker">
+      <span>📝 价格追踪</span><span class="key">F6</span>
+    </div>
+    <div class="nav-item" onclick="switchView('fluctuation')" data-view="fluctuation">
+      <span>📉 价格波动</span><span class="key">F7</span>
+    </div>
+    <div class="divider"></div>
+    <div class="section-head">GLOBAL</div>
+    <div class="nav-item" onclick="switchView('global')" data-view="global">
+      <span>🌍 全球市场</span><span class="key">F8</span>
+    </div>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="content-area">
+    <div class="center-panel" id="centerPanel">
+      <!-- Views injected by JS -->
+    </div>
+
+    <!-- RIGHT PANEL -->
+    <div class="right-panel" id="rightPanel">
+      <div class="panel-header">⚡ QUICK METRICS</div>
+      <div class="metric-card" id="rpIdrUsd">
+        <div class="metric-label">IDR→USD</div>
+        <div class="metric-value" style="color:var(--amber);">16,500</div>
+        <div class="metric-sub">更新中...</div>
+      </div>
+      <div class="metric-card" id="rpUsdCny">
+        <div class="metric-label">USD→CNY</div>
+        <div class="metric-value" style="color:var(--cyan);">7.25</div>
+        <div class="metric-sub">更新中...</div>
+      </div>
+      <div class="metric-card flash" id="rpFreight">
+        <div class="metric-label">海运费 40HQ</div>
+        <div class="metric-value" style="color:var(--amber);">$1,200</div>
+        <div class="metric-sub">印尼→中国 主要港口</div>
+      </div>
+      <div class="metric-card highlight" id="rpIndex">
+        <div class="metric-label">MATERIAL INDEX</div>
+        <div class="metric-value" style="color:var(--green);">72.4</div>
+        <div class="metric-sub">炭化料综合指数</div>
+      </div>
+
+      <div class="panel-header" style="margin-top:4px;">📰 MARKET ALERTS</div>
+      <div class="alert warn">⚠ 印尼配额收紧 — Q1对华出口降13%</div>
+      <div class="alert info">📦 苏门答腊雨季延长 — 供货延迟</div>
+      <div class="alert danger">🔥 国内烧烤季 — 需求上升</div>
+
+      <div class="panel-header" style="margin-top:4px;">💡 TIP</div>
+      <div style="font-size:11px;color:var(--text2);line-height:1.8;">
+        首单建议：1-2个20GP试水<br>
+        付款：30%订金+70%见提单付<br>
+        低价800碘值大概率掺杂<br>
+        按 <kbd style="font-family:var(--font-mono);color:var(--amber);background:var(--panel2);padding:1px 5px;border-radius:2px;">F1-F8</kbd> 切换视图<br>
+        数据每日 <span style="color:var(--green);">08:00</span> 自动更新
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ====== BOTTOM BAR ====== -->
+<div class="bottombar">
+  <span class="cmd-prompt">CSC&gt;</span>
+  <input type="text" id="cmdInput" placeholder="输入指令: HELP 查看命令列表" onkeydown="handleCmd(event)">
+  <div class="status">
+    <span>DATA: <span class="dot"></span> <span id="dataStatus">LIVE</span></span>
+    <span id="statusTime">22:21:00</span>
+    <span>DB: <span id="dbRecordCount">0</span>d</span>
+    <span>REC: <span id="recordCount">0</span></span>
+  </div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script src="prices.js"></script>
+<script>
+// ====== DATA ======
+const MARKET_DATA = {
+  products: [
+    { sym: 'CCM-RAW', name: '炭化料', price: 4500, unit: 'IDR/kg', chg: 2.3, region: '印尼FOB' },
+    { sym: 'CCM-BBQ', name: '烧烤炭', price: 4200, unit: '¥/吨', chg: -1.2, region: '中国批发' },
+    { sym: 'CCM-SHI', name: '水烟炭', price: 6800, unit: '¥/吨', chg: 3.8, region: '中国批发' },
+    { sym: 'CCM-AC8', name: '活性炭800', price: 7500, unit: '¥/吨', chg: 1.5, region: '河南出厂' },
+    { sym: 'CCM-AC1', name: '活性炭1000', price: 9800, unit: '¥/吨', chg: 0.5, region: '河南出厂' },
+  ],
+  rates: [
+    { sym: 'IDR/USD', val: 16500, chg: -0.3 },
+    { sym: 'USD/CNY', val: 7.25, chg: 0.1 },
+    { sym: 'FREIGHT', val: 1200, chg: 5.2, unit: 'USD/40HQ' },
+  ],
+  regions: [
+    { name: '苏门答腊', share: 55, price_low: 3500, price_high: 5000, ports: 'Panjang, Dumai', quality: '灰分低,固定碳高', transit: '2-5天' },
+    { name: '加里曼丹', share: 25, price_low: 3000, price_high: 4500, ports: 'Pontianak', quality: '性价比高', transit: '1-3天' },
+    { name: '苏拉威西', share: 15, price_low: 3200, price_high: 4800, ports: 'Bitung, Makassar', quality: '密度高,燃烧久', transit: '1-4天' },
+    { name: '爪哇', share: 5, price_low: 3800, price_high: 5200, ports: 'Surabaya', quality: '加工集散', transit: '1-2天' },
+  ],
+  chinaPrices: [
+    { grade: '400-500', size: '1-5mm', price: '2,950-4,200', use: '基础净水' },
+    { grade: '600-650', size: '1-5mm', price: '4,350-6,000', use: '工业脱色' },
+    { grade: '700', size: '1-5mm', price: '6,500-8,000', use: '食品工业' },
+    { grade: '800', size: '8-15目', price: '5,550-10,000', use: '黄金提炼' },
+    { grade: '900-1000', size: '1-5mm', price: '6,950-9,800', use: '贵金属/医药' },
+    { grade: '1100+', size: '1-5mm', price: '9,900-15,000', use: '军工制药' },
+  ],
+  productTypes: [
+    { name: '炭化料(原料)', spec: '颗粒/片状', wholesale: '2,500-4,500', retail: '—', trend: 'up' },
+    { name: '机制烧烤炭', spec: '方块/六角', wholesale: '3,000-5,000', retail: '¥15-30/kg', trend: 'up' },
+    { name: '高端烧烤炭', spec: '方块/枕头', wholesale: '5,000-8,000', retail: '¥30-50/kg', trend: 'stable' },
+    { name: '水烟炭(Shisha)', spec: '方块/圆饼', wholesale: '5,000-8,000', retail: '¥40-80/kg', trend: 'up' },
+    { name: '高端水烟炭', spec: 'Cube', wholesale: '8,000-12,000', retail: '¥60-120/kg', trend: 'hot' },
+  ],
+};
+
+// ====== STORAGE ======
+const STORAGE_KEY = 'csc_terminal_prices';
+function getRecords() { try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; } catch(e) { return []; } }
+function saveRecords(r) { localStorage.setItem(STORAGE_KEY, JSON.stringify(r)); }
+function addRecord(date, type, price, note) {
+  const records = getRecords();
+  records.push({ date, type, price, note: note || '', ts: Date.now() });
+  records.sort((a,b) => a.date.localeCompare(b.date));
+  saveRecords(records);
+  updateBottomStatus();
+  return records;
+}
+function deleteRecord(index) {
+  const records = getRecords();
+  records.splice(index, 1);
+  saveRecords(records);
+  updateBottomStatus();
+  return records;
+}
+
+// ====== TICKER ======
+function buildTicker() {
+  // Use priceDatabase if available for live changes
+  let products, rates;
+  if (typeof priceDatabase !== 'undefined' && priceDatabase.history && priceDatabase.history.length >= 2) {
+    const h = priceDatabase.history;
+    const latest = h[h.length-1], prev = h[h.length-2];
+    const pct = (a,b) => b ? (((a-b)/b)*100) : 0;
+    products = [
+      { sym: 'CCM-RAW', name: '炭化料', price: latest.raw, unit: 'IDR/kg', chg: pct(latest.raw, prev.raw), region: '印尼FOB' },
+      { sym: 'CCM-BBQ', name: '烧烤炭', price: latest.bbq, unit: '¥/吨', chg: pct(latest.bbq, prev.bbq), region: '中国批发' },
+      { sym: 'CCM-SHI', name: '水烟炭', price: latest.shisha, unit: '¥/吨', chg: pct(latest.shisha, prev.shisha), region: '中国批发' },
+      { sym: 'CCM-AC8', name: '活性炭800', price: latest.ac800, unit: '¥/吨', chg: pct(latest.ac800, prev.ac800), region: '河南出厂' },
+      { sym: 'CCM-AC1', name: '活性炭1000', price: latest.ac1000, unit: '¥/吨', chg: pct(latest.ac1000, prev.ac1000), region: '河南出厂' },
+    ];
+    rates = [
+      { sym: 'IDR/USD', val: latest.usd_idr, chg: pct(latest.usd_idr, prev.usd_idr) },
+      { sym: 'USD/CNY', val: latest.usd_cny, chg: pct(latest.usd_cny, prev.usd_cny) },
+      { sym: 'FREIGHT', val: latest.freight, chg: pct(latest.freight, prev.freight), unit: 'USD/40HQ' },
+    ];
+    // Update MARKET_DATA for other views
+    MARKET_DATA.products = products;
+    MARKET_DATA.rates = rates;
+  } else {
+    products = MARKET_DATA.products;
+    rates = MARKET_DATA.rates;
+  }
+
+  const items = [];
+  products.forEach(p => {
+    const dir = p.chg >= 0 ? 'up' : 'down';
+    const arrow = p.chg >= 0 ? '▲' : '▼';
+    const chgStr = Math.abs(p.chg).toFixed(1) + '%';
+    items.push(`<div class="ticker-item"><span class="sym">${p.sym}</span> <span class="val">${p.price.toLocaleString()} ${(p.unit||'').split('/')[0]}</span> <span class="chg ${dir}">${arrow}${chgStr}</span></div>`);
+  });
+  rates.forEach(r => {
+    const dir = r.chg >= 0 ? 'up' : 'down';
+    const arrow = r.chg >= 0 ? '▲' : '▼';
+    items.push(`<div class="ticker-item"><span class="sym">${r.sym}</span> <span class="val">${r.val.toLocaleString()}${r.unit||''}</span> <span class="chg ${dir}">${arrow}${Math.abs(r.chg).toFixed(1)}%</span></div>`);
+  });
+  document.getElementById('ticker').innerHTML = items.join('') + items.join('');
+}
+
+// ====== CLOCK ======
+function updateClock() {
+  const now = new Date();
+  const s = now.toISOString().replace('T',' ').slice(0,19);
+  document.getElementById('clock').textContent = s + ' UTC+8';
+  document.getElementById('statusTime').textContent = now.toTimeString().slice(0,8);
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+// ====== VIEW SWITCHING ======
+let currentView = 'overview';
+
+function switchView(name) {
+  currentView = name;
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.querySelector(`[data-view="${name}"]`)?.classList.add('active');
+  renderView(name);
+}
+
+function renderView(name) {
+  const center = document.getElementById('centerPanel');
+  switch(name) {
+    case 'overview': center.innerHTML = renderOverview(); break;
+    case 'charts': center.innerHTML = renderCharts(); setTimeout(drawDBChart, 100); break;
+    case 'calculator': center.innerHTML = renderCalculator(); setTimeout(() => { if(currentView==='calculator') calculate(); }, 50); break;
+    case 'supply': center.innerHTML = renderSupply(); break;
+    case 'china': center.innerHTML = renderChina(); break;
+    case 'tracker': center.innerHTML = renderTracker(); setTimeout(drawTrackerChart, 100); break;
+    case 'fluctuation': center.innerHTML = renderFluctuation(); setTimeout(drawFluctuationChart, 100); break;
+    case 'global': center.innerHTML = renderGlobal(); break;
+  }
+}
+
+// ====== OVERVIEW ======
+function renderOverview() {
+  const p = MARKET_DATA.products;
+  const avg800 = 7500, avg1000 = 9800, rawIDR = 4500;
+  const spread800 = avg800 - 3200; // rough landed vs selling
+  const spread1000 = avg1000 - 3800;
+
+  return `
+    <div class="metric-row col4">
+      ${p.map(x => `
+        <div class="metric-card ${x.sym === 'CCM-SHI' ? 'flash' : ''}">
+          <div class="metric-label">${x.sym}</div>
+          <div class="metric-value" style="color:${x.chg>=0?'var(--green)':'var(--red)'}">${x.price.toLocaleString()}</div>
+          <div class="metric-sub">${x.name} · ${x.unit}</div>
+        </div>
+      `).join('')}
+    </div>
+    <div class="metric-row">
+      <div style="grid-column:1/-1;">
+        <div class="chart-box" style="height:240px;">
+          <canvas id="overviewChart"></canvas>
+        </div>
+      </div>
+    </div>
+    <div class="metric-row col4">
+      <div class="metric-card highlight">
+        <div class="metric-label">炭化料→活性炭800 价差</div>
+        <div class="metric-value" style="color:var(--green);">¥${spread800}/吨</div>
+        <div class="metric-sub">原料落地成本 ~¥3,200 → 出厂 ~¥7,500</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">水烟炭 出厂均��</div>
+        <div class="metric-value" style="color:var(--amber);">¥6,800</div>
+        <div class="metric-sub">中东市场驱动 <span class="up">▲ 3.8%</span></div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">印尼对华出口 Q1</div>
+        <div class="metric-value" style="color:var(--red);">▼ 13%</div>
+        <div class="metric-sub">配额收紧 + 减产</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">市场温度</div>
+        <div class="metric-value" style="color:var(--amber);">🔥 炎热</div>
+        <div class="metric-sub">烧烤季 + 水烟旺季</div>
+      </div>
+    </div>
+    <div class="alert warn" style="margin-top:6px;">⚠ 2026 Q1: 印尼椰子减产5-8%, 炭化料价格同比涨15%, 建议提前锁单</div>
+  `;
+}
+
+// ====== CHARTS ======
+function renderCharts() {
+  return `
+    <div class="panel-header">📈 PRICE CHARTS <span class="badge">LIVE</span></div>
+    <div class="chart-box" style="height:340px;">
+      <canvas id="mainChart"></canvas>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:6px;">
+      <button class="btn sm amber" onclick="drawMainChart()">🔄 刷新</button>
+      <button class="btn sm" onclick="changeChartRange(7)">7天</button>
+      <button class="btn sm" onclick="changeChartRange(30)">30天</button>
+      <button class="btn sm" onclick="changeChartRange(90)">90天</button>
+    </div>
+    <div style="font-size:10px;color:var(--text3);margin-top:4px;">
+      数据基于每日追踪记录 | 无记录时显示模拟走势
+    </div>
+  `;
+}
+
+function drawDBChart() { drawChartDB('mainChart', 340); }
+function drawOverviewChart() {
+  setTimeout(() => drawChartDB('overviewChart', 220), 50);
+}
+
+// Get data from priceDatabase (external) with fallback to records+simulation
+function getChartData(days) {
+  if (typeof priceDatabase !== 'undefined' && priceDatabase.history && priceDatabase.history.length > 0) {
+    const h = priceDatabase.history.slice(-days);
+    const dates = h.map(r => r.date);
+    return {
+      dates,
+      series: [
+        { name: '炭化料 IDR/kg', data: h.map(r => r.raw), unit: 'IDR/kg' },
+        { name: '活性炭800 ¥/吨', data: h.map(r => r.ac800), unit: '¥/吨' },
+        { name: '水烟炭 ¥/吨', data: h.map(r => r.shisha), unit: '¥/吨' },
+        { name: '烧烤炭 ¥/吨', data: h.map(r => r.bbq), unit: '¥/吨' },
+        { name: '活性炭1000 ¥/吨', data: h.map(r => r.ac1000), unit: '¥/吨' },
+      ]
+    };
+  }
+  // Fallback to localStorage records
+  const records = getRecords();
+  if (records.length > 0) {
+    const dates = [...new Set(records.map(r => r.date))].sort().slice(-days);
+    const types = [...new Set(records.map(r => r.type))];
+    const series = types.map(t => ({
+      name: t, data: dates.map(d => { const r = records.filter(x => x.date===d && x.type===t); return r.length ? r[r.length-1].price : null; })
+    }));
+    return { dates, series };
+  }
+  // Simulated fallback
+  const now = new Date();
+  const dates = [];
+  for (let i = days; i >= 0; i--) { const d = new Date(now); d.setDate(d.getDate()-i); dates.push(d.toISOString().slice(0,10)); }
+  return {
+    dates,
+    series: [
+      { name: '炭化料 IDR/kg', data: dates.map((_,i) => 4200 + Math.sin(i*0.12)*300 + i*8 + Math.random()*100) },
+      { name: '活性炭800 ¥/吨', data: dates.map((_,i) => 6800 + Math.sin(i*0.1)*400 + i*12 + Math.random()*200) },
+      { name: '水烟炭 ¥/吨', data: dates.map((_,i) => 6200 + Math.sin(i*0.08)*500 + i*15 + Math.random()*150) },
+    ]
+  };
+}
+
+function drawChartDB(canvasId, height, dayCount) {
+  const canvas = document.getElementById(canvasId);
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const parent = canvas.parentElement;
+  const w = parent.clientWidth - 24;
+  const h = height;
+  canvas.width = w * 2; canvas.height = h * 2;
+  canvas.style.width = w + 'px'; canvas.style.height = h + 'px';
+  ctx.scale(2, 2);
+
+  const { dates, series } = getChartData(dayCount || 60);
+  const colors = ['#f5a623', '#2d7dd2', '#00e396', '#ff4560', '#a855f7'];
+  const pad = { t: 15, r: 20, b: 30, l: 65 };
+  const cw = w - pad.l - pad.r, ch = h - pad.t - pad.b;
+
+  let min = Infinity, max = -Infinity;
+  series.forEach(s => s.data.forEach(v => { if (v !== null) { if (v < min) min = v; if (v > max) max = v; } }));
+  if (min === max) { min -= 100; max += 100; }
+  const range = max - min;
+
+  ctx.strokeStyle = '#1e2860'; ctx.lineWidth = 0.5;
+  for (let i = 0; i <= 4; i++) {
+    const y = pad.t + (ch/4)*i;
+    ctx.beginPath(); ctx.moveTo(pad.l, y); ctx.lineTo(w-pad.r, y); ctx.stroke();
+    ctx.fillStyle = '#6b7db3'; ctx.font = '9px monospace'; ctx.textAlign = 'right';
+    const val = max - (range/4)*i;
+    ctx.fillText(val >= 1000 ? (val/1000).toFixed(1)+'k' : val.toFixed(0), pad.l-8, y+3);
+  }
+
+  series.forEach((s, idx) => {
+    const color = colors[idx % colors.length];
+    ctx.strokeStyle = color; ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    let started = false;
+    dates.forEach((_, i) => {
+      if (s.data[i] === null) { started = false; return; }
+      const x = pad.l + (cw/(dates.length-1))*i;
+      const y = pad.t + ch - ((s.data[i]-min)/range)*ch;
+      if (!started) { ctx.moveTo(x, y); started = true; }
+      else ctx.lineTo(x, y);
+    });
+    ctx.stroke();
+  });
+
+  ctx.fillStyle = '#6b7db3'; ctx.font = '8px monospace'; ctx.textAlign = 'center';
+  const step = Math.max(1, Math.floor(dates.length/6));
+  dates.forEach((d, i) => {
+    if (i%step===0 || i===dates.length-1) ctx.fillText(d.slice(5), pad.l+(cw/(dates.length-1))*i, h-5);
+  });
+
+  let lx = pad.l; ctx.textAlign = 'left';
+  series.forEach((s, idx) => {
+    const color = colors[idx%colors.length];
+    ctx.fillStyle = color; ctx.fillRect(lx, 2, 8, 8);
+    ctx.fillStyle = '#c8d6e5'; ctx.font = '9px monospace';
+    const label = s.name.length>14 ? s.name.slice(0,14)+'..' : s.name;
+    ctx.fillText(label, lx+11, 9);
+    lx += ctx.measureText(label).width + 24;
+  });
+}
+
+function changeChartRange(days) {
+  drawChartDB('mainChart', 340, days);
+  showToast(`范围切换: ${days}天`);
+}
+
+// ====== CALCULATOR ======
+function renderCalculator() {
+  return `
+    <div class="panel-header">🧮 PROFIT CALCULATOR <span class="badge">IDR→CNY</span></div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>采购价 (IDR/kg)</label>
+        <input type="number" id="calcPrice" value="4500" placeholder="印尼盾/公斤">
+        <span class="hint">当前 3,500-6,000</span>
+      </div>
+      <div class="form-group">
+        <label>采购量 (吨)</label>
+        <input type="number" id="calcQty" value="20" placeholder="吨">
+        <span class="hint">1×40HQ ≈ 20-26吨</span>
+      </div>
+      <div class="form-group">
+        <label>IDR→USD</label>
+        <input type="number" id="calcIdrUsd" value="16500" placeholder="汇率">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>USD→CNY</label>
+        <input type="number" id="calcUsdCny" value="7.25" step="0.01">
+      </div>
+      <div class="form-group">
+        <label>海运费 (USD/柜)</label>
+        <input type="number" id="calcFreight" value="1200">
+        <span class="hint">印尼→中国 40HQ</span>
+      </div>
+      <div class="form-group">
+        <label>港杂+拖车 (¥/柜)</label>
+        <input type="number" id="calcPort" value="5000">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>保险费率 (%)</label>
+        <input type="number" id="calcIns" value="0.3" step="0.01">
+      </div>
+      <div class="form-group">
+        <label>关税 (%)</label>
+        <input type="number" id="calcTariff" value="0" step="0.01">
+        <span class="hint">Form E → 0%</span>
+      </div>
+      <div class="form-group">
+        <label>增值税 (%)</label>
+        <input type="number" id="calcVat" value="13" step="0.01">
+      </div>
+    </div>
+    <button class="btn amber" onclick="calculate()" style="width:100%;padding:10px;font-size:12px;margin-top:6px;">
+      ⚡ RUN CALCULATION
+    </button>
+    <div id="calcResult"></div>
+  `;
+}
+
+function calculate() {
+  const p = parseFloat(document.getElementById('calcPrice')?.value) || 4500;
+  const q = parseFloat(document.getElementById('calcQty')?.value) || 20;
+  const rI = parseFloat(document.getElementById('calcIdrUsd')?.value) || 16500;
+  const rC = parseFloat(document.getElementById('calcUsdCny')?.value) || 7.25;
+  const fr = parseFloat(document.getElementById('calcFreight')?.value) || 1200;
+  const pt = parseFloat(document.getElementById('calcPort')?.value) || 5000;
+  const ins = parseFloat(document.getElementById('calcIns')?.value) || 0.3;
+  const tf = parseFloat(document.getElementById('calcTariff')?.value) || 0;
+  const vat = parseFloat(document.getElementById('calcVat')?.value) || 13;
+
+  const fobUSD = (p * 1000) / rI;
+  const fobCNY = fobUSD * rC;
+  const freightPT = (fr * rC) / q;
+  const insPT = (fobCNY * q * ins / 100) / q;
+  const cifPT = fobCNY + freightPT + insPT;
+  const dutyPT = cifPT * (tf / 100);
+  const vatPT = (cifPT + dutyPT) * (vat / 100);
+  const portPT = pt / q;
+  const landedPT = cifPT + dutyPT + vatPT + portPT;
+
+  const scenarios = [
+    { margin: 10, sell: landedPT * 1.10 },
+    { margin: 20, sell: landedPT * 1.20, rec: true },
+    { margin: 30, sell: landedPT * 1.30 },
+    { margin: 50, sell: landedPT * 1.50 },
+  ];
+
+  const result = document.getElementById('calcResult');
+  if (!result) return;
+  result.innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px;">
+      <div class="metric-card"><div class="metric-label">FOB 离岸 (¥/吨)</div><div class="metric-value" style="font-size:16px;">¥${fobCNY.toFixed(0)}</div></div>
+      <div class="metric-card"><div class="metric-label">CIF 到岸 (¥/吨)</div><div class="metric-value" style="font-size:16px;">¥${cifPT.toFixed(0)}</div></div>
+      <div class="metric-card"><div class="metric-label">关税+增值税</div><div class="metric-value" style="font-size:16px;color:var(--red);">¥${(dutyPT+vatPT).toFixed(0)}</div></div>
+      <div class="metric-card"><div class="metric-label">港杂分摊</div><div class="metric-value" style="font-size:16px;">¥${portPT.toFixed(0)}</div></div>
+    </div>
+    <div class="result-banner">
+      <div class="label">🇨🇳 人民币落地成本 (含税含运费)</div>
+      <div class="big-num">¥${landedPT.toFixed(0)} / 吨</div>
+      <div style="font-size:12px;color:var(--text2);margin-top:4px;">总成本 ¥${(landedPT*q).toLocaleString()} · ${q}吨 · 约 ${scenarios[1].sell.toFixed(0)} 起售</div>
+    </div>
+    <table class="data-table" style="margin-top:10px;">
+      <thead><tr><th>毛利率</th><th>售价 ¥/吨</th><th>吨利润</th><th>总利润 (${q}吨)</th></tr></thead>
+      <tbody>
+        ${scenarios.map(s => `
+          <tr ${s.rec?'style="background:rgba(245,166,35,0.08);"':''}>
+            <td>${s.margin}%${s.rec?' <span class="tag tag-amber">推荐</span>':''}</td>
+            <td><strong>¥${s.sell.toFixed(0)}</strong></td>
+            <td class="up">¥${(s.sell - landedPT).toFixed(0)}</td>
+            <td class="up">¥${((s.sell - landedPT) * q).toLocaleString()}</td>
+          </tr>
+        `).join('')}
+      </tbody>
+    </table>
+  `;
+}
+
+// ====== SUPPLY ======
+function renderSupply() {
+  return `
+    <div class="panel-header">🏭 SUPPLY CHAIN · 印尼产地 <span class="badge">4 REGIONS</span></div>
+    <div class="region-cards">
+      ${MARKET_DATA.regions.map(r => `
+        <div class="region-card">
+          <div class="r-name">🌴 ${r.name}</div>
+          <div class="r-stat"><span class="l">产能占比</span><span class="v">${r.share}%</span></div>
+          <div class="r-stat"><span class="l">炭化料价格</span><span class="v" style="color:var(--amber);">${r.price_low.toLocaleString()}-${r.price_high.toLocaleString()} IDR/kg</span></div>
+          <div class="r-stat"><span class="l">港口</span><span class="v">${r.ports}</span></div>
+          <div class="r-stat"><span class="l">品质</span><span class="v" style="color:var(--green);">${r.quality}</span></div>
+          <div class="r-stat"><span class="l">到港时间</span><span class="v">${r.transit}</span></div>
+        </div>
+      `).join('')}
+    </div>
+    <div style="margin-top:10px;">
+      <table class="data-table">
+        <thead><tr><th>采购环节</th><th>关键点</th><th>参考成本</th></tr></thead>
+        <tbody>
+          <tr><td>PPN 增值税</td><td>印尼境内采购含11%（可退税）</td><td>货值 × 11%</td></tr>
+          <tr><td>出口文件 PEB</td><td>印尼海关出口报关</td><td>$50-150/票</td></tr>
+          <tr><td>Form E 产地证</td><td>中国享0%关税必备</td><td>$30-80/票</td></tr>
+          <tr><td>SGS/CCIC 检测</td><td>装船前品质检验</td><td>$300-600/票</td></tr>
+          <tr><td>装柜/短驳</td><td>工厂→港口陆运</td><td>$300-800/柜</td></tr>
+          <tr><td>熏蒸证书</td><td>木托盘包装需要</td><td>$50-100/票</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="alert info" style="margin-top:8px;">
+      💡 拿货建议：首单1-2个20GP试水 · 付款30%订金+70%见提单 · 合同中注明灰分≤3%,固定碳≥75% · 避免11月-3月雨季
+    </div>
+  `;
+}
+
+// ====== CHINA MARKET ======
+function renderChina() {
+  return `
+    <div class="panel-header">🇨🇳 CHINA DOWNSTREAM MARKET <span class="badge">2026.05</span></div>
+    <div class="metric-row">
+      <div class="metric-card highlight">
+        <div class="metric-label">活性炭 出厂价区间</div>
+        <div class="metric-value" style="color:var(--green);font-size:16px;">¥2,950-15,000</div>
+        <div class="metric-sub">按碘值分级 · 河南基准</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">烧烤炭 批发价</div>
+        <div class="metric-value" style="color:var(--amber);font-size:16px;">¥3,000-8,000</div>
+        <div class="metric-sub">旺季3-10月 <span class="up">↑</span></div>
+      </div>
+    </div>
+    <table class="data-table" style="margin-top:8px;">
+      <thead><tr><th>碘值</th><th>规格</th><th>出厂价 ¥/吨</th><th>用途</th><th>趋势</th></tr></thead>
+      <tbody>
+        ${MARKET_DATA.chinaPrices.map(c => `
+          <tr>
+            <td><strong>${c.grade}</strong></td>
+            <td>${c.size}</td>
+            <td style="color:var(--amber);">¥${c.price}</td>
+            <td>${c.use}</td>
+            <td><span class="tag tag-green">↑</span></td>
+          </tr>
+        `).join('')}
+      </tbody>
+    </table>
+    <div class="panel-header" style="margin-top:12px;">🔥 其他产品线</div>
+    <table class="data-table">
+      <thead><tr><th>产品</th><th>规格</th><th>批发 ¥/吨</th><th>零售</th><th>热度</th></tr></thead>
+      <tbody>
+        ${MARKET_DATA.productTypes.map(p => {
+          let trendTag = '';
+          if (p.trend === 'up') trendTag = '<span class="tag tag-green">↑ 上涨</span>';
+          else if (p.trend === 'hot') trendTag = '<span class="tag tag-red">🔥 热门</span>';
+          else trendTag = '<span class="tag tag-blue">→ 平稳</span>';
+          return `<tr><td><strong>${p.name}</strong></td><td>${p.spec}</td><td style="color:var(--amber);">¥${p.wholesale}</td><td>${p.retail}</td><td>${trendTag}</td></tr>`;
+        }).join('')}
+      </tbody>
+    </table>
+    <div class="alert danger" style="margin-top:8px;">
+      ⚠ 警惕：碘值800以下报价¥8,000/吨大概率掺杂煤质炭或虚标参数
+    </div>
+  `;
+}
+
+// ====== TRACKER ======
+function renderTracker() {
+  const records = getRecords();
+  const today = new Date().toISOString().slice(0,10);
+  return `
+    <div class="panel-header">📝 PRICE TRACKER <span class="badge">${records.length} RECORDS</span></div>
+    <div class="chart-box" style="height:200px;">
+      <canvas id="trackerChart"></canvas>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:6px;margin-top:8px;align-items:end;">
+      <div class="form-group">
+        <label>日期</label>
+        <input type="date" id="trkDate" value="${today}">
+      </div>
+      <div class="form-group">
+        <label>品类</label>
+        <select id="trkType">
+          <option>炭化料 (IDR/kg)</option>
+          <option>烧烤炭 (¥/吨)</option>
+          <option>水烟炭 (¥/吨)</option>
+          <option>活性炭800 (¥/吨)</option>
+          <option>活性炭1000 (¥/吨)</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>价格</label>
+        <input type="number" id="trkPrice" placeholder="价格">
+      </div>
+      <button class="btn amber sm" onclick="trackerAdd()" style="height:fit-content;">➕ ADD</button>
+    </div>
+    <div class="form-group" style="margin-top:6px;">
+      <label>备注</label>
+      <input type="text" id="trkNote" placeholder="如：苏门答腊FOB、山东客户..." style="width:100%;padding:6px;background:#0a0e27;border:1px solid var(--border);color:var(--text);border-radius:3px;font-size:11px;">
+    </div>
+    <div style="margin-top:8px;display:flex;gap:6px;">
+      <button class="btn sm green" onclick="exportCSV()">📥 导出CSV</button>
+      <button class="btn sm red" onclick="clearTracker()">🗑 清空</button>
+    </div>
+    <div id="trackerTable" style="margin-top:8px;max-height:300px;overflow-y:auto;"></div>
+  `;
+}
+
+function trackerAdd() {
+  const date = document.getElementById('trkDate')?.value;
+  const type = document.getElementById('trkType')?.value;
+  const price = parseFloat(document.getElementById('trkPrice')?.value);
+  const note = document.getElementById('trkNote')?.value || '';
+  if (!date || !price) { showToast('请填写日期和价格'); return; }
+  addRecord(date, type, price, note);
+  document.getElementById('trkPrice').value = '';
+  document.getElementById('trkNote').value = '';
+  renderView('tracker');
+  showToast('✅ 记录已保存');
+}
+
+function drawTrackerChart() {
+  const records = getRecords();
+  const canvas = document.getElementById('trackerChart');
+  if (!canvas) return;
+  const parent = canvas.parentElement;
+  const w = parent.clientWidth - 24;
+  const h = 200;
+  canvas.width = w * 2;
+  canvas.height = h * 2;
+  canvas.style.width = w + 'px';
+  canvas.style.height = h + 'px';
+  const ctx = canvas.getContext('2d');
+  ctx.scale(2, 2);
+
+  if (records.length === 0) {
+    ctx.fillStyle = '#6b7db3'; ctx.font = '12px monospace'; ctx.textAlign = 'center';
+    ctx.fillText('暂无记录 — 添加第一条价格数据', w/2, h/2);
+    return;
+  }
+
+  const dates = [...new Set(records.map(r => r.date))].sort().slice(-30);
+  const types = [...new Set(records.map(r => r.type))];
+  const colors = ['#f5a623', '#2d7dd2', '#00e396', '#ff4560', '#a855f7'];
+  const pad = { t: 10, r: 15, b: 25, l: 55 };
+  const cw = w - pad.l - pad.r, ch = h - pad.t - pad.b;
+
+  let min = Infinity, max = -Infinity;
+  records.forEach(r => { if (r.price < min) min = r.price; if (r.price > max) max = r.price; });
+  if (min === max) { min -= 50; max += 50; }
+  const range = max - min;
+
+  // Grid
+  ctx.strokeStyle = '#1e2860'; ctx.lineWidth = 0.5;
+  for (let i = 0; i <= 3; i++) {
+    const y = pad.t + (ch / 3) * i;
+    ctx.beginPath(); ctx.moveTo(pad.l, y); ctx.lineTo(w - pad.r, y); ctx.stroke();
+    ctx.fillStyle = '#6b7db3'; ctx.font = '8px monospace'; ctx.textAlign = 'right';
+    ctx.fillText(Math.round(max - (range/3)*i).toLocaleString(), pad.l - 6, y + 3);
+  }
+
+  // Lines
+  types.forEach((type, ti) => {
+    const typeData = records.filter(r => r.type === type);
+    const color = colors[ti % colors.length];
+    ctx.strokeStyle = color; ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    let started = false;
+    dates.forEach((d, i) => {
+      const rec = typeData.find(r => r.date === d);
+      if (!rec) { started = false; return; }
+      const x = pad.l + (cw / (dates.length - 1)) * i;
+      const y = pad.t + ch - ((rec.price - min) / range) * ch;
+      if (!started) { ctx.moveTo(x, y); started = true; }
+      else ctx.lineTo(x, y);
+    });
+    ctx.stroke();
+    // Dots
+    dates.forEach((d, i) => {
+      const rec = typeData.find(r => r.date === d);
+      if (!rec) return;
+      const x = pad.l + (cw / (dates.length - 1)) * i;
+      const y = pad.t + ch - ((rec.price - min) / range) * ch;
+      ctx.fillStyle = color; ctx.beginPath(); ctx.arc(x, y, 2.5, 0, Math.PI*2); ctx.fill();
+    });
+  });
+
+  // Labels
+  ctx.fillStyle = '#6b7db3'; ctx.font = '7px monospace'; ctx.textAlign = 'center';
+  const step = Math.max(1, Math.floor(dates.length / 5));
+  dates.forEach((d, i) => {
+    if (i % step === 0) ctx.fillText(d.slice(5), pad.l + (cw/(dates.length-1))*i, h - 6);
+  });
+
+  // Table
+  const tableDiv = document.getElementById('trackerTable');
+  if (tableDiv) {
+    const recent = [...records].reverse().slice(0, 30);
+    tableDiv.innerHTML = `<table class="data-table"><thead><tr><th>日期</th><th>品类</th><th>价格</th><th>备注</th><th></th></tr></thead><tbody>
+      ${recent.map((r, i) => `
+        <tr>
+          <td>${r.date}</td><td>${r.type}</td>
+          <td style="color:var(--amber);">${r.price.toLocaleString()}</td>
+          <td style="font-size:10px;color:var(--text3);">${r.note||'—'}</td>
+          <td><button class="btn sm red" onclick="delRec(${records.length-1-i})" style="font-size:9px;padding:2px 6px;">X</button></td>
+        </tr>
+      `).join('')}
+    </tbody></table>`;
+  }
+}
+
+function delRec(idx) { deleteRecord(idx); renderView('tracker'); showToast('已删除'); }
+function clearTracker() { if (!confirm('清空所有记录？')) return; localStorage.removeItem(STORAGE_KEY); updateBottomStatus(); renderView('tracker'); showToast('已清空'); }
+function exportCSV() {
+  const records = getRecords();
+  if (!records.length) { showToast('无数据'); return; }
+  let csv = '\uFEFF日期,品类,价格,备注\n';
+  records.forEach(r => csv += `${r.date},${r.type},${r.price},${r.note||''}\n`);
+  const blob = new Blob([csv], {type:'text/csv'});
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+  a.download = `椰壳炭行情_${new Date().toISOString().slice(0,10)}.csv`; a.click();
+  showToast('📥 CSV已下载');
+}
+
+// ====== COMMAND LINE ======
+function handleCmd(e) {
+  if (e.key !== 'Enter') return;
+  const input = document.getElementById('cmdInput');
+  const cmd = input.value.trim().toUpperCase();
+  input.value = '';
+  switch(cmd) {
+    case 'HELP': showToast('命令: OV/CH/CA/SP/CN/TR/FL/GL | F1-F8 | EXPORT | CLEAR'); break;
+    case 'OV': switchView('overview'); break;
+    case 'CH': switchView('charts'); break;
+    case 'CA': switchView('calculator'); break;
+    case 'SP': switchView('supply'); break;
+    case 'CN': switchView('china'); break;
+    case 'TR': switchView('tracker'); break;
+    case 'FL': switchView('fluctuation'); break;
+    case 'GL': switchView('global'); break;
+    case 'EXPORT': exportCSV(); break;
+    case 'CLEAR': clearTracker(); break;
+    default: showToast('未知命令. 输入 HELP 查看列表'); break;
+  }
+}
+
+// ====== KEYBOARD ======
+document.addEventListener('keydown', e => {
+  if (e.target.tagName === 'INPUT') return;
+  switch(e.key) {
+    case 'F1': e.preventDefault(); switchView('overview'); break;
+    case 'F2': e.preventDefault(); switchView('charts'); break;
+    case 'F3': e.preventDefault(); switchView('calculator'); break;
+    case 'F4': e.preventDefault(); switchView('supply'); break;
+    case 'F5': e.preventDefault(); switchView('china'); break;
+    case 'F6': e.preventDefault(); switchView('tracker'); break;
+    case 'F7': e.preventDefault(); switchView('fluctuation'); break;
+    case 'F8': e.preventDefault(); switchView('global'); break;
+  }
+});
+
+// ====== FLUCTUATION VIEW ======
+function renderFluctuation() {
+  if (typeof priceDatabase === 'undefined' || !priceDatabase.history || priceDatabase.history.length < 2) {
+    return `<div class="panel-header">📉 价格波动</div>
+      <div class="alert warn">暂无外部价格数据。请确保 prices.js 已加载。数据每日 08:00 自动更新。</div>`;
+  }
+  const h = priceDatabase.history;
+  const latest = h[h.length-1], prev = h[h.length-2];
+  const weekAgo = h[Math.max(0, h.length-8)];
+  const monthAgo = h[Math.max(0, h.length-31)];
+
+  const pct = (a,b) => b ? (((a-b)/b)*100) : 0;
+  const products = [
+    { key: 'raw', name: '炭化料', unit: 'IDR/kg', sym: 'CCM-RAW' },
+    { key: 'bbq', name: '烧烤炭', unit: '¥/吨', sym: 'CCM-BBQ' },
+    { key: 'shisha', name: '水烟炭', unit: '¥/吨', sym: 'CCM-SHI' },
+    { key: 'ac800', name: '活性炭800', unit: '¥/吨', sym: 'CCM-AC8' },
+    { key: 'ac1000', name: '活性炭1000', unit: '¥/吨', sym: 'CCM-AC1' },
+  ];
+
+  const fmtChg = (v) => {
+    const cls = v >= 0 ? 'up' : 'down';
+    const arrow = v >= 0 ? '▲' : '▼';
+    return `<span class="${cls}">${arrow} ${Math.abs(v).toFixed(1)}%</span>`;
+  };
+
+  // Build product cards
+  const cards = products.map(p => {
+    const dayChg = pct(latest[p.key], prev[p.key]);
+    const weekChg = pct(latest[p.key], weekAgo[p.key]);
+    const monthChg = pct(latest[p.key], monthAgo[p.key]);
+    const trend = monthChg > 5 ? '🔥' : monthChg > 1 ? '📈' : monthChg < -3 ? '📉' : '➡️';
+    return `<div class="metric-card ${Math.abs(dayChg)>2?'flash':''}">
+      <div class="metric-label">${p.sym} · ${p.name}</div>
+      <div class="metric-value" style="font-size:16px;color:${dayChg>=0?'var(--green)':'var(--red)'}">${latest[p.key].toLocaleString()} ${p.unit}</div>
+      <div class="metric-sub">
+        日 ${fmtChg(dayChg)} &nbsp; 周 ${fmtChg(weekChg)} &nbsp; 月 ${fmtChg(monthChg)} &nbsp; ${trend}
+      </div>
+    </div>`;
+  }).join('');
+
+  // Build 7-day detail table
+  const recent7 = h.slice(-7).reverse();
+  const tableHeaders = products.map(p => `<th>${p.sym}</th>`).join('');
+  const tableRows = recent7.map((r, ri) => {
+    const cells = products.map(p => {
+      const prevRow = recent7[ri+1];
+      const chg = prevRow ? pct(r[p.key], prevRow[p.key]) : 0;
+      const bg = chg > 1 ? 'rgba(0,227,150,0.08)' : chg < -1 ? 'rgba(255,69,96,0.08)' : 'transparent';
+      const color = chg > 0.5 ? 'var(--green)' : chg < -0.5 ? 'var(--red)' : 'var(--text)';
+      return `<td style="background:${bg};color:${color};font-weight:600;">${r[p.key].toLocaleString()}</td>`;
+    }).join('');
+    return `<tr><td style="color:var(--amber);">${r.date.slice(5)}</td>${cells}</tr>`;
+  }).join('');
+
+  return `
+    <div class="panel-header">📉 PRICE FLUCTUATION <span class="badge">${h.length} DAYS · 更新 ${priceDatabase.updated||'--'}</span></div>
+    <div class="metric-row col3" style="grid-template-columns:1fr 1fr 1fr 1fr 1fr;">${cards}</div>
+    <div class="chart-box" style="height:200px;margin-top:8px;"><canvas id="fluctuationChart"></canvas></div>
+    <div class="panel-header" style="margin-top:10px;">📋 7日明细</div>
+    <div style="overflow-x:auto;">
+      <table class="data-table">
+        <thead><tr><th>日期</th>${tableHeaders}</tr></thead>
+        <tbody>${tableRows}</tbody>
+      </table>
+    </div>
+    <div class="alert info" style="margin-top:8px;">
+      💡 数据来源：每日自动采集 | 绿色=较前日上涨，红色=下跌 | 按 <kbd style="color:var(--amber);">F7</kbd> 或命令 <kbd style="color:var(--amber);">FL</kbd> 打开此视图
+    </div>
+  `;
+}
+
+function drawFluctuationChart() {
+  const canvas = document.getElementById('fluctuationChart');
+  if (!canvas) return;
+  if (typeof priceDatabase === 'undefined' || !priceDatabase.history || priceDatabase.history.length < 2) return;
+  const h = priceDatabase.history.slice(-30);
+  const ctx = canvas.getContext('2d');
+  const parent = canvas.parentElement;
+  const w = parent.clientWidth - 24, ht = 200;
+  canvas.width = w*2; canvas.height = ht*2;
+  canvas.style.width = w+'px'; canvas.style.height = ht+'px';
+  ctx.scale(2, 2);
+
+  // Show daily % changes as bar chart
+  const changes = [];
+  for (let i = 1; i < h.length; i++) {
+    const pct = ((h[i].raw - h[i-1].raw) / h[i-1].raw) * 100;
+    changes.push({ date: h[i].date, pct });
+  }
+
+  const pad = { t: 10, r: 15, b: 25, l: 55 };
+  const cw = w - pad.l - pad.r, ch = ht - pad.t - pad.b;
+  const barW = Math.max(2, Math.min(8, cw / changes.length - 2));
+
+  let maxAbs = 0;
+  changes.forEach(c => { const a = Math.abs(c.pct); if (a > maxAbs) maxAbs = a; });
+  if (maxAbs < 1) maxAbs = 2;
+  maxAbs = Math.ceil(maxAbs);
+
+  // Zero line
+  const zeroY = pad.t + ch/2;
+  ctx.strokeStyle = '#2a3678'; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(pad.l, zeroY); ctx.lineTo(w-pad.r, zeroY); ctx.stroke();
+
+  // Bars
+  changes.forEach((c, i) => {
+    const x = pad.l + (cw/(changes.length-1))*i - barW/2;
+    const barH = (Math.abs(c.pct)/maxAbs) * (ch/2);
+    const y = c.pct >= 0 ? zeroY - barH : zeroY;
+    const color = c.pct >= 0 ? '#00e396' : '#ff4560';
+    ctx.fillStyle = color; ctx.globalAlpha = 0.7;
+    ctx.fillRect(x, y, barW, barH);
+    ctx.globalAlpha = 1;
+  });
+
+  // Y-axis labels
+  ctx.fillStyle = '#6b7db3'; ctx.font = '8px monospace'; ctx.textAlign = 'right';
+  ctx.fillText('+'+maxAbs+'%', pad.l-5, pad.t+10);
+  ctx.fillText('0%', pad.l-5, zeroY+3);
+  ctx.fillText('-'+maxAbs+'%', pad.l-5, ht-5);
+
+  // X-axis
+  ctx.textAlign = 'center';
+  const step = Math.max(1, Math.floor(changes.length/5));
+  changes.forEach((c, i) => {
+    if (i%step===0) ctx.fillText(c.date.slice(5), pad.l+(cw/(changes.length-1))*i, ht-6);
+  });
+
+  // Title
+  ctx.fillStyle = '#c8d6e5'; ctx.font = '10px monospace'; ctx.textAlign = 'left';
+  ctx.fillText('炭化料日波动率 (IDR/kg) · 绿涨红跌', pad.l, pad.t-2);
+}
+
+// ====== GLOBAL MARKET DATA ======
+const GLOBAL_MARKET = {
+  regions: [
+    { id: 'tr', flag: '🇹🇷', name: '土耳其', role: '欧亚中转枢纽', demand: '极高', priceSens: '高', preferred: '立方体/六角形', cfrLow: 1100, cfrHigh: 1500, growth: 12, note: '核心枢纽 · 对货柜一致性要求高', barrier: '价格竞争激烈' },
+    { id: 'pk', flag: '🇵🇰', name: '巴基斯坦', role: '南亚新兴市场', demand: '中高', priceSens: '极高', preferred: '方块/大包装', cfrLow: 950, cfrHigh: 1300, growth: 18, note: '水烟文化深厚 · 印尼进口增长快', barrier: '价格敏感 · 偏好小规格零售' },
+    { id: 'de', flag: '🇩🇪', name: '德国', role: '欧洲最大买家(31%)', demand: '极高', priceSens: '中', preferred: 'Cube / 自有品牌', cfrLow: 1350, cfrHigh: 1800, growth: 18, note: '要求REACH+PAHs<1mg/kg', barrier: '合规门槛高 · 认证周期长' },
+    { id: 'uk', flag: '🇬🇧', name: '英国', role: '欧洲第二大(22%)', demand: '很高', priceSens: '中', preferred: 'Cube / 环保包装', cfrLow: 1300, cfrHigh: 1750, growth: 21, note: '自有品牌机会多 · 增长最快', barrier: 'UKCA认证 · 包装要求严格' },
+    { id: 'kz', flag: '🇰🇿', name: '哈萨克斯坦', role: '中亚门户市场', demand: '中', priceSens: '中高', preferred: '方块/经济装', cfrLow: 1000, cfrHigh: 1400, growth: 15, note: '蓝海市场 · 椰壳炭渗透率提升', barrier: '内陆运输成本高' },
+    { id: 'uz', flag: '🇺🇿', name: '乌兹别克斯坦', role: '中亚新兴市场', demand: '中低', priceSens: '高', preferred: '方块/大包装', cfrLow: 950, cfrHigh: 1350, growth: 20, note: '水烟文化兴起 · 通过土耳其中转', barrier: '物流渠道有限 · 市场教育期' },
+    { id: 'ae', flag: '🇦🇪', name: '阿联酋', role: '中东分销中心', demand: '极高', priceSens: '较低', preferred: 'Cube / 高端品牌', cfrLow: 1400, cfrHigh: 2000, growth: 10, note: '品质要求最高 · 灰分<2%', barrier: '竞争激烈 · 品牌忠诚度高' },
+    { id: 'sa', flag: '🇸🇦', name: '沙特阿拉伯', role: '中东最大消费国', demand: '极高', priceSens: '较低', preferred: 'Cube / 定制包装', cfrLow: 1350, cfrHigh: 1900, growth: 8, note: '高端水烟文化 · 燃烧>90分', barrier: 'SASO认证 · 清真认证' },
+  ],
+  summary: {
+    totalMarket: '全球水烟炭市场 ~$3.2B (2026E)',
+    coconutShare: '椰壳炭占比 ~65% (持续上升)',
+    topExporter: '印尼 (全球供应链60%+)',
+    avgGrowth: '全球CAGR ~15%',
+    cubePremium: '方块炭溢价 20-35% vs 传统炭',
+  },
+  tips: [
+    { market: '欧洲', tip: '必做REACH+PAHs检测 · 投入$2,000-5,000认证费可打开$1,200+/吨市场' },
+    { market: '中东', tip: '灰分<2%是硬门槛 · 建议从苏门答腊高端线采购' },
+    { market: '中亚', tip: '通过土耳其分销商进入 · 降低物流和政治风险' },
+    { market: '巴基斯坦', tip: '小规格零售装+大包装批发组合 · 价格要有竞争力' },
+  ],
+};
+
+// ====== GLOBAL MARKET VIEW ======
+function renderGlobal() {
+  const r = GLOBAL_MARKET.regions;
+  const s = GLOBAL_MARKET.summary;
+
+  // Market cards
+  const cards = r.map(m => {
+    const priceRange = `$${m.cfrLow.toLocaleString()}-${m.cfrHigh.toLocaleString()}`;
+    const growthColor = m.growth > 15 ? 'var(--green)' : m.growth > 10 ? 'var(--amber)' : 'var(--text)';
+    return `<div class="region-card" style="position:relative;">
+      <div class="r-name">${m.flag} ${m.name}</div>
+      <div class="r-stat"><span class="l">市场角色</span><span class="v">${m.role}</span></div>
+      <div class="r-stat"><span class="l">需求热度</span><span class="v" style="color:var(--amber);">${m.demand}</span></div>
+      <div class="r-stat"><span class="l">CIF 参考价</span><span class="v" style="color:var(--green);">${priceRange}/吨</span></div>
+      <div class="r-stat"><span class="l">年增长率</span><span class="v" style="color:${growthColor};">▲ ${m.growth}%</span></div>
+      <div class="r-stat"><span class="l">偏好形态</span><span class="v">${m.preferred}</span></div>
+      <div class="r-stat"><span class="l">进入壁垒</span><span class="v" style="color:var(--red);font-size:10px;">${m.barrier}</span></div>
+      <div class="r-stat" style="border:none;"><span class="l" style="font-size:10px;">💡 ${m.note}</span></div>
+    </div>`;
+  }).join('');
+
+  // Market entry tips
+  const tipCards = GLOBAL_MARKET.tips.map(t => `
+    <div class="metric-card">
+      <div class="metric-label">🎯 ${t.market} 策略</div>
+      <div class="metric-sub" style="font-size:11px;line-height:1.6;color:var(--text);">${t.tip}</div>
+    </div>
+  `).join('');
+
+  return `
+    <div class="panel-header">🌍 GLOBAL SHISHA CHARCOAL MARKET <span class="badge">8 REGIONS</span></div>
+
+    <!-- Summary row -->
+    <div class="metric-row col4">
+      <div class="metric-card highlight">
+        <div class="metric-label">全球市场规模</div>
+        <div class="metric-value" style="color:var(--amber);font-size:16px;">${s.totalMarket}</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">椰壳炭占比</div>
+        <div class="metric-value" style="color:var(--green);font-size:16px;">${s.coconutShare}</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">全球年增长率</div>
+        <div class="metric-value" style="color:var(--green);font-size:16px;">${s.avgGrowth}</div>
+      </div>
+      <div class="metric-card flash">
+        <div class="metric-label">方块炭溢价</div>
+        <div class="metric-value" style="color:var(--amber);font-size:16px;">${s.cubePremium}</div>
+      </div>
+    </div>
+
+    <!-- Region grid -->
+    <div class="panel-header" style="margin-top:10px;">📍 核心消费市场</div>
+    <div class="region-cards" style="grid-template-columns:1fr 1fr 1fr 1fr;">${cards}</div>
+
+    <!-- Market entry strategies -->
+    <div class="panel-header" style="margin-top:12px;">🎯 市场进入策略</div>
+    <div class="metric-row" style="grid-template-columns:1fr 1fr;">${tipCards}</div>
+
+    <!-- Price comparison table -->
+    <div class="panel-header" style="margin-top:10px;">💰 全球价格对比 (CIF USD/吨)</div>
+    <table class="data-table">
+      <thead><tr><th>市场</th><th>低价</th><th>高价</th><th>中位价</th><th>价差(vs中国)</th><th>热度</th></tr></thead>
+      <tbody>
+        ${r.map(m => {
+          const mid = (m.cfrLow + m.cfrHigh) / 2;
+          const vsChina = mid - 1050; // roughly vs China domestic
+          const vsStr = vsChina > 0 ? '+' + vsChina.toFixed(0) : vsChina.toFixed(0);
+          const heatIcon = m.demand === '极高' ? '🔥🔥' : m.demand === '很高' ? '🔥' : '📈';
+          return `<tr>
+            <td><strong>${m.flag} ${m.name}</strong></td>
+            <td style="color:var(--green);">$${m.cfrLow.toLocaleString()}</td>
+            <td style="color:var(--red);">$${m.cfrHigh.toLocaleString()}</td>
+            <td style="color:var(--amber);">$${mid.toFixed(0)}</td>
+            <td class="${vsChina>0?'up':'down'}">${vsStr}</td>
+            <td>${heatIcon}</td>
+          </tr>`;
+        }).join('')}
+      </tbody>
+    </table>
+
+    <!-- Bottom alert -->
+    <div class="alert info" style="margin-top:8px;">
+      💡 印尼是全球椰壳炭出口霸主(60%+) · 方块炭出口价远高于散装炭化料 · 欧洲需要REACH/PAHs认证 · 中东需要SASO/清真认证 · 中亚是蓝海市场 · 建议首攻欧洲(利润高)或巴基斯坦(门槛低)
+    </div>
+    <div style="font-size:10px;color:var(--text3);margin-top:4px;">
+      数据参考来源：HarumCoco, Djavacoal, Alibaba, Volza | 价格为CIF参考区间，实际以谈判为准
+    </div>
+  `;
+}
+
+// ====== RIGHT PANEL REFRESH ======
+function refreshRightPanel() {
+  if (typeof priceDatabase === 'undefined' || !priceDatabase.history || priceDatabase.history.length < 2) return;
+  const h = priceDatabase.history;
+  const latest = h[h.length-1], prev = h[h.length-2], weekAgo = h[Math.max(0,h.length-8)];
+  const pct = (a,b) => b ? (((a-b)/b)*100) : 0;
+  const fmt = (v) => { const cls=v>=0?'up':'down'; const a=v>=0?'▲':'▼'; return `<span class="${cls}">${a} ${Math.abs(v).toFixed(1)}%</span>`; };
+
+  const rpIdr = document.getElementById('rpIdrUsd');
+  if (rpIdr) { rpIdr.querySelector('.metric-value').textContent = latest.usd_idr.toLocaleString(); rpIdr.querySelector('.metric-sub').innerHTML = fmt(pct(latest.usd_idr, weekAgo.usd_idr)) + ' vs 7天前'; }
+
+  const rpCny = document.getElementById('rpUsdCny');
+  if (rpCny) { rpCny.querySelector('.metric-value').textContent = latest.usd_cny; rpCny.querySelector('.metric-sub').innerHTML = fmt(pct(latest.usd_cny, weekAgo.usd_cny)) + ' vs 7天前'; }
+
+  const rpFr = document.getElementById('rpFreight');
+  if (rpFr) rpFr.querySelector('.metric-value').textContent = '$'+latest.freight.toLocaleString();
+
+  const rpIdx = document.getElementById('rpIndex');
+  if (rpIdx) {
+    const idx = Math.round(latest.raw / 60);
+    const idxChg = Math.round((latest.raw - weekAgo.raw) / 60 * 10) / 10;
+    rpIdx.querySelector('.metric-value').textContent = idx.toFixed(1);
+    rpIdx.querySelector('.metric-sub').innerHTML = '炭化料综合指数 ' + fmt(idxChg);
+  }
+}
+function showToast(msg) {
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 2000);
+}
+function updateBottomStatus() {
+  const el = document.getElementById('recordCount');
+  if (el) el.textContent = getRecords().length;
+  const dbEl = document.getElementById('dbRecordCount');
+  if (dbEl && typeof priceDatabase !== 'undefined' && priceDatabase.history) {
+    dbEl.textContent = priceDatabase.history.length;
+  }
+  const dsEl = document.getElementById('dataStatus');
+  if (dsEl) {
+    const hasDB = typeof priceDatabase !== 'undefined' && priceDatabase.history && priceDatabase.history.length > 0;
+    dsEl.textContent = hasDB ? 'LIVE' : 'SIM';
+  }
+}
+
+// ====== INIT ======
+function init() {
+  buildTicker();
+  updateBottomStatus();
+  refreshRightPanel();
+  renderView('overview');
+  setTimeout(drawOverviewChart, 200);
+}
+init();
+</script>
+</body>
+</html>
