@@ -1,5 +1,5 @@
 var priceDatabase = {
-  "updated": "2026-06-07T10:14:33+08",
+  "updated": "2026-06-08T14:40:25+08",
   "source": "SMM导入",
   "history": [
     {
@@ -865,6 +865,18 @@ var priceDatabase = {
       "usd_idr": 18096,
       "usd_cny": 6.79,
       "freight": 1306
+    },
+    {
+      "date": "2026-06-08",
+      "note": "SMM导入",
+      "raw": 8000,
+      "bbq": 4218,
+      "shisha": 6922,
+      "ac800": 7571,
+      "ac1000": 9959,
+      "usd_idr": 18088,
+      "usd_cny": 6.79,
+      "freight": 1297
     }
   ]
 };
